@@ -2,8 +2,10 @@
 <p align="center"><strong>Your AI Pair-Programmer That Actually Teaches You</strong> <br> Built with ❤️ by <a href="https://github.com/shubhamranswal">Shubham Singh Ranswal</a> • 🌐<a href="https://shubhamranswal.github.io/PasPas" target="_blank">Visit Live Site</a>↗
 </p>
 
+<hr>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/shubhamranswal/TechGuru/Images/banner_1.png" width="70%" />
+  <img src="https://raw.githubusercontent.com/shubhamranswal/TechGuru/main/Images/banner_1.png" width="70%" />
 </p>
 
 <p align="center">
