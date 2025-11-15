@@ -1,4 +1,3 @@
-# demo/demo_fastapi.py
 """
 Improved FastAPI demo for TechGuru:
 - Serves a friendly landing page at /
@@ -80,22 +79,24 @@ def bughunt(body: CodeIn):
 @app.post("/scaffold")
 def scaffold(body: ScaffoldIn):
     files = agent_core.scaffold_project(body.project_name)
-    # Optionally, write files into demo/<project_name> so /run-tests can run them
-    demo_root = os.path.join(os.path.dirname(__file__), body.project_name)
-    os.makedirs(demo_root, exist_ok=True)
+    demo_dir = os.path.join(os.path.dirname(__file__), body.project_name)
+    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data', 'sample_projects', body.project_name)
+    os.makedirs(demo_dir, exist_ok=True)
+    os.makedirs(data_dir, exist_ok=True)
     for rel_path, content in files.items():
-        # files keys are like "project_name/..."
-        # write into demo/<project_name>/...
         parts = rel_path.split("/", 1)
-        if len(parts) == 2:
-            _, subpath = parts
-        else:
-            subpath = rel_path
-        full = os.path.join(os.path.dirname(__file__), body.project_name, subpath)
-        os.makedirs(os.path.dirname(full), exist_ok=True)
-        with open(full, "w", encoding="utf-8") as f:
+        subpath = parts[1] if len(parts) == 2 else parts[0]
+        # write demo copy
+        demo_full = os.path.join(demo_dir, subpath)
+        os.makedirs(os.path.dirname(demo_full), exist_ok=True)
+        with open(demo_full, "w", encoding="utf-8") as f:
             f.write(content)
-    return {"files_written": list(files.keys()), "demo_dir": f"demo/{body.project_name}"}
+        # write data copy
+        data_full = os.path.join(data_dir, subpath)
+        os.makedirs(os.path.dirname(data_full), exist_ok=True)
+        with open(data_full, "w", encoding="utf-8") as f:
+            f.write(content)
+    return {"files_written": list(files.keys()), "demo_dir": f"demo/{body.project_name}", "data_dir": f"data/sample_projects/{body.project_name}"}
 
 @app.get("/run-tests")
 def run_tests(project: str = "sample_project"):
