@@ -5,13 +5,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-      - name: Install deps
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install repository package (editable) and dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -e .
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
       - name: Run tests
         run: pytest -q

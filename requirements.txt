@@ -8,3 +8,4 @@ PyPDF2
 tqdm
 faiss-cpu
 python-dotenv
+setuptools
