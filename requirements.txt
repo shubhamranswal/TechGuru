@@ -1,0 +1,10 @@
+google-genai
+fastapi
+uvicorn
+pytest
+pydantic
+pandas
+PyPDF2
+tqdm
+faiss-cpu
+python-dotenv
