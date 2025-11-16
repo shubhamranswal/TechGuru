@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>TechGuru - Chat</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Prism -->
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+
+  <style>
+    :root{
+      --bg-top: #0e1522;
+      --bg-bottom: #131d2c;
+      --panel: #182331;
+      --bubble-me: #1f5b47;
+      --bubble-bot: #1a2c3a;
+      --input-bg: #0f1a24;
+      --muted: #a8c7d8;
+      --accent: #00e0c6;
+      --border-soft: rgba(255,255,255,0.06);
+      --fade-time: 220ms;
+    }
+
+    /* animated gradient */
+    @keyframes bgShift {
+      0%{ background-position:0% 50% }
+      50%{ background-position:100% 50% }
+      100%{ background-position:0% 50% }
+    }
+
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", Arial;
+      background: linear-gradient(120deg,var(--bg-top),var(--bg-bottom));
+      background-size:200% 200%;
+      animation: bgShift 18s ease infinite;
+      color:#e8f6ff;
+    }
+
+    /* app layout */
+    .app {
+      display:grid;
+      grid-template-rows: 72px 1fr 110px;
+      grid-template-columns: 1fr 360px;
+      gap:18px;
+      height:100vh;
+      padding:22px;
+      box-sizing:border-box;
+    }
+
+    header.top {
+      grid-column:1 / -1;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:14px 20px;
+      border-radius:12px;
+      background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      box-shadow:0 6px 26px rgba(2,6,10,0.45);
+      position:relative;
+    }
+    header.top img {height:44px; border-radius:8px;}
+    header .title {font-size:20px; font-weight:700;}
+    header .subtitle {font-size:13px; color:var(--muted); margin-top:4px;}
+
+    /* header controls */
+    .header-controls { margin-left:auto; display:flex; gap:10px; align-items:center; }
+
+    .tiny-btn { background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.03); padding:6px 8px; border-radius:8px; cursor:pointer; font-size:13px; }
+    .tiny-btn.active{ border-color:var(--accent); color:var(--accent); background:rgba(0,224,198,0.04); }
+
+    /* main chat area */
+    .chat-area {
+      background: linear-gradient(180deg, #151f2d 0%, #101a25 100%);
+      border-radius:12px;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      box-shadow:0 6px 26px rgba(2,6,10,0.55);
+    }
+
+    .side {
+      background:var(--panel);
+      border-radius:12px;
+      padding:16px;
+      overflow:auto;
+      box-shadow:0 6px 20px rgba(0,0,0,0.45);
+      border:1px solid var(--border-soft);
+    }
+    .side h3{margin:0 0 10px 0;}
+    .side .muted{color:var(--muted); font-size:13px;}
+
+    .messages { flex:1; overflow:auto; display:flex; flex-direction:column; gap:12px; padding-right:6px; }
+
+    .msg { display:flex; gap:10px; align-items:flex-start; opacity:0; transform:translateY(6px); animation:fadeIn var(--fade-time) forwards; }
+    @keyframes fadeIn { to{ opacity:1; transform:none } }
+
+    .avatar { width:36px; height:36px; border-radius:50%; flex:0 0 36px; display:flex; align-items:center; justify-content:center; font-weight:700; color:white; font-size:14px; }
+    .avatar.user{ background: linear-gradient(135deg, #1f5b47, #1a6d52); }
+    .avatar.bot{ background: linear-gradient(135deg, #214459, #173147); }
+
+    .bubble {
+      padding:12px 14px;
+      border-radius:12px;
+      max-width:86%;
+      word-break:break-word;
+      white-space:pre-wrap;
+      line-height:1.45;
+      background:linear-gradient(135deg,var(--bubble-bot),#173041);
+      color:#e7fffb;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      position:relative;
+    }
+    .bubble.me { margin-left:auto; background:linear-gradient(135deg,var(--bubble-me),#1a6d52); color:#eafff0; }
+
+    .meta { font-size:12px; color:var(--muted); margin-top:6px; }
+
+    /* composer */
+    .composer {
+      grid-column:1 / -1;
+      display:flex;
+      gap:14px;
+      align-items:flex-end;
+      padding:16px;
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
+      box-shadow:0 -6px 30px rgba(0,0,0,0.45);
+    }
+    textarea#prompt{ flex:1; min-height:88px; max-height:260px; padding:14px; border-radius:12px; border:1px solid var(--border-soft); background:var(--input-bg); color:#e5f7ff; resize:vertical; }
+
+    .controls { display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+
+    .btn { background:var(--accent); border:0; padding:10px 16px; border-radius:10px; font-weight:700; cursor:pointer; color:#002f2a; }
+    .btn.secondary{ background:transparent; border:1px solid rgba(255,255,255,0.03); color:var(--muted); }
+
+    pre { background: rgba(0,0,0,0.22); padding:12px; border-radius:8px; overflow:auto; max-height:420px; border:1px solid var(--border-soft); }
+    pre.codewrap { position:relative; padding-top:36px; }
+    .copy-btn { position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.06); border:0; padding:6px 8px; border-radius:6px; cursor:pointer; color:#eaffff; }
+
+    /* scroll-to-bottom */
+    #scrollBottom { position:fixed; right:28px; bottom:120px; background:var(--accent); color:#012b23; padding:10px 12px; border-radius:999px; border:0; cursor:pointer; display:none; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+
+    /* monospace toggle */
+    .monospace pre, .monospace .bubble { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace; }
+
+    /* light theme overrides */
+    .light {
+      --bg-top: #f5f7fb;
+      --bg-bottom: #e9f2fb;
+      --panel: #ffffff;
+      --bubble-me: #c7f0e4;
+      --bubble-bot: #dfeef8;
+      --input-bg: #ffffff;
+      --muted: #4b6b78;
+      --accent: #0a9f7a;
+      --border-soft: rgba(0,0,0,0.06);
+      color: #0b2330;
+    }
+    .light .bubble { color:#06242a }
+    .light pre { background:#f6fbff; color:#05232b; border:1px solid rgba(0,0,0,0.04); }
+    .light header.top { background:linear-gradient(90deg,#ffffff,#f1f7fb); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+
+    @media (max-width:900px){
+      .app{ grid-template-columns:1fr; grid-template-rows:72px 1fr 120px; padding:12px; }
+      .side{ grid-column:1 / -1; order:3; }
+      #scrollBottom { right:14px; bottom:160px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="appRoot">
+    <header class="top">
+      <img src="/images/logo_1.png" onerror="this.style.display='none'"/>
+      <div style="flex:1">
+        <div class="title">TechGuru - Your AI Pair-Programmer</div>
+        <div class="subtitle">Explains code, generates tests, suggests patches, and scaffolds projects - interactively.</div>
+      </div>
+
+      <div class="header-controls" role="toolbar" aria-label="UI controls">
+        <button id="themeToggle" class="tiny-btn" title="Toggle light / dark">🌗 Theme</button>
+        <button id="contrastToggle" class="tiny-btn" title="High contrast">⚡ Contrast</button>
+        <button id="monoToggle" class="tiny-btn" title="Toggle monospace">⌨ Monospace</button>
+      </div>
+    </header>
+
+    <main class="chat-area" role="main">
+      <div style="display:flex;align-items:center;gap:10px;justify-content:space-between">
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="mode" style="padding:8px;border-radius:8px;border:0;background:var(--panel);color:var(--muted)">
+            <option value="explain">Explain Code</option>
+            <option value="generate-tests">Generate Tests</option>
+            <option value="bughunt">Bug Hunt & Patch</option>
+            <option value="scaffold">Scaffold Project</option>
+          </select>
+          <button id="clearBtn" class="btn secondary">Clear</button>
+        </div>
+        <div style="color:var(--muted);font-size:13px">Tip: <strong>Ctrl+Enter</strong> to send</div>
+      </div>
+
+      <div class="messages" id="chat" aria-live="polite"></div>
+    </main>
+
+    <aside class="side" id="sidePanel" aria-label="Tips panel">
+      <h3>Quick Tips</h3>
+      <p class="muted">Choose a mode, paste code, and press Send. For scaffold, pass JSON: <code>{"project_name":"myproj"}</code></p>
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0"/>
+      <h4 style="margin:6px 0 8px 0">Shortcuts</h4>
+      <ul class="muted" style="padding-left:18px">
+        <li><strong>Explain</strong> for line-by-line analysis</li>
+        <li><strong>Generate Tests</strong> outputs pytest files</li>
+        <li><strong>Bug Hunt</strong> returns issues + patch suggestions</li>
+        <li><strong>Scaffold</strong> writes a mini project on the server</li>
+      </ul>
+      <div style="height:14px"></div>
+      <button id="collapseSide" class="btn secondary" style="width:100%">Collapse Tips</button>
+    </aside>
+
+    <section class="composer" role="region" aria-label="Message composer">
+      <textarea id="prompt" placeholder='Paste code or describe a task. For scaffold, use JSON: {"project_name":"myproj"}'></textarea>
+      <div class="controls">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="small" id="status" style="color:var(--muted)">idle</div>
+          <button id="sendBtn" class="btn">Send</button>
+        </div>
+        <div style="font-size:12px;color:var(--muted);text-align:right">TechGuru • Local Demo</div>
+      </div>
+    </section>
+  </div>
+
+  <button id="scrollBottom" title="Scroll to bottom">↓ Bottom</button>
+
+<script>
+/* --- DOM refs --- */
+const appRoot = document.getElementById('appRoot');
+const chatEl = document.getElementById('chat');
+const promptEl = document.getElementById('prompt');
+const sendBtn = document.getElementById('sendBtn');
+const modeEl = document.getElementById('mode');
+const clearBtn = document.getElementById('clearBtn');
+const statusEl = document.getElementById('status');
+const collapseSideBtn = document.getElementById('collapseSide');
+const sidePanel = document.getElementById('sidePanel');
+const themeToggle = document.getElementById('themeToggle');
+const contrastToggle = document.getElementById('contrastToggle');
+const monoToggle = document.getElementById('monoToggle');
+const scrollBottomBtn = document.getElementById('scrollBottom');
+
+/* --- Utilities --- */
+function setStatus(s){ statusEl.innerText = s; }
+function escapeHtml(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function sanitizeText(t){ if(!t) return ""; t = t.replace(/```(?:\w+)?\n/g,'').replace(/```/g,''); return t.trim(); }
+function findJsonString(s){ if(!s||typeof s!=='string') return null; let sTrim=s.trim(); if((sTrim.startsWith('{')&&sTrim.endsWith('}'))||(sTrim.startsWith('[')&&sTrim.endsWith(']'))) return sTrim; const re=/(\{[\s\S]*\}|\[[\s\S]*\])/m; const m=s.match(re); return m?m[1]:null; }
+function tryParseJSONFromText(t){ try{ return JSON.parse(t); }catch(e){} const candidate=findJsonString(t); if(candidate){ try{ return JSON.parse(candidate); }catch(e){ try{ return JSON.parse(candidate.replace(/'/g,'"')); }catch(e){} } } return null; }
+function timeNow(){ const d=new Date(); return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+
+/* --- Appenders --- */
+function makeAvatar(kind){ const el=document.createElement('div'); el.className='avatar '+(kind==='me'?'user':'bot'); el.textContent = kind==='me'?'Y':'TG'; return el; }
+function appendMessage(role, htmlContent, opts={time:true}){
+  const container = document.createElement('div'); container.className='msg';
+  const avatar = makeAvatar(role==='me'?'me':'bot');
+  const bubble = document.createElement('div'); bubble.className='bubble ' + (role==='me'?'me':'');
+  bubble.innerHTML = htmlContent;
+  // meta: timestamp & copy if code present
+  const meta = document.createElement('div'); meta.className='meta';
+  const time = opts.time ? timeNow() : '';
+  meta.innerHTML = time ? `${time}` : '';
+  bubble.appendChild(meta);
+  container.appendChild(avatar);
+  container.appendChild(bubble);
+  chatEl.appendChild(container);
+  chatEl.scrollTop = chatEl.scrollHeight;
+  attachCopyButtons(container);
+  return bubble;
+}
+
+/* copy buttons */
+function attachCopyButtons(container){
+  const blocks = container.querySelectorAll('pre code');
+  blocks.forEach(code => {
+    const pre = code.parentElement;
+    if(pre && !pre.querySelector('.copy-btn')){
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.innerText = 'Copy';
+      btn.addEventListener('click', ()=> {
+        navigator.clipboard.writeText(code.textContent).then(()=> {
+          btn.innerText='Copied';
+          setTimeout(()=>btn.innerText='Copy',1200);
+        });
+      });
+      pre.classList.add('codewrap');
+      pre.insertBefore(btn, pre.firstChild);
+    }
+  });
+}
+
+/* clear handler */
+clearBtn.addEventListener('click', ()=>{ chatEl.innerHTML=''; setStatus('idle'); });
+
+/* collapse side */
+collapseSideBtn.addEventListener('click', ()=>{
+  if(sidePanel.style.display==='none'){ sidePanel.style.display='block'; collapseSideBtn.innerText='Collapse Tips'; }
+  else { sidePanel.style.display='none'; collapseSideBtn.innerText='Expand Tips'; }
+});
+
+/* theme toggles - persist */
+function applyTheme(){
+  const theme = localStorage.getItem('techguru_theme') || 'dark';
+  const contrast = localStorage.getItem('techguru_contrast') === '1';
+  const mono = localStorage.getItem('techguru_mono') === '1';
+  if(theme==='light') appRoot.classList.add('light'); else appRoot.classList.remove('light');
+  themeToggle.classList.toggle('active', theme==='light');
+  contrastToggle.classList.toggle('active', contrast);
+  monoToggle.classList.toggle('active', mono);
+  if(contrast) document.documentElement.style.setProperty('--accent','#ffb86b'); else document.documentElement.style.setProperty('--accent','#00e0c6');
+  if(mono) document.body.classList.add('monospace'); else document.body.classList.remove('monospace');
+}
+themeToggle.addEventListener('click', ()=> { const cur = localStorage.getItem('techguru_theme')||'dark'; localStorage.setItem('techguru_theme', cur==='dark'?'light':'dark'); applyTheme(); });
+contrastToggle.addEventListener('click', ()=> { const c = localStorage.getItem('techguru_contrast')==='1'; localStorage.setItem('techguru_contrast', c? '0' : '1'); applyTheme(); });
+monoToggle.addEventListener('click', ()=> { const m = localStorage.getItem('techguru_mono')==='1'; localStorage.setItem('techguru_mono', m? '0' : '1'); applyTheme(); });
+applyTheme();
+
+/* scroll to bottom button */
+chatEl.addEventListener('scroll', ()=> {
+  const atBottom = chatEl.scrollTop + chatEl.clientHeight >= chatEl.scrollHeight - 40;
+  scrollBottomBtn.style.display = atBottom ? 'none' : 'block';
+});
+scrollBottomBtn.addEventListener('click', ()=> { chatEl.scrollTop = chatEl.scrollHeight; scrollBottomBtn.style.display='none'; });
+
+/* streaming send (keeps behavior from before) */
+async function send(){
+  const mode = modeEl.value;
+  const raw = promptEl.value.trim();
+  if(!raw) return;
+  appendMessage('me','<pre style="margin:0">'+escapeHtml(raw)+'</pre>');
+  setStatus('streaming...');
+  sendBtn.disabled = true;
+
+  let payload = { mode: mode, payload: {} };
+  if(mode==='generate-tests' || mode==='explain' || mode==='bughunt'){ payload.payload={ code: raw, lang:'python' }; }
+  else if(mode==='scaffold'){ try{ payload.payload = JSON.parse(raw); } catch { payload.payload = { project_name: raw || 'sample_project' }; } }
+
+  try {
+    const res = await fetch('/stream', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    if(!res.ok){ const txt = await res.text(); appendMessage('bot','<pre>Server error: '+escapeHtml(txt)+'</pre>'); setStatus('error'); return; }
+
+    const bubbleEl = appendMessage('bot','<div class="streaming"><em>▌</em></div>');
+    bubbleEl.style.maxHeight='520px'; bubbleEl.style.overflowY='auto';
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let done=false; let accumulated=''; const CHAR_CAP = 26000;
+
+    while(!done){
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      if(value){
+        const chunk = decoder.decode(value, {stream:true});
+        accumulated += chunk;
+        if(accumulated.length > CHAR_CAP){
+          accumulated = accumulated.slice(0, CHAR_CAP) + '\n\n[TRUNCATED]';
+          try{ reader.cancel(); } catch(e){ }
+          done = true;
+        }
+
+        const parsed = tryParseJSONFromText(accumulated);
+        if(parsed){
+          let html='';
+          if(mode==='explain' && parsed.summary){
+            html += '<div><strong>Summary:</strong><div>'+escapeHtml(String(parsed.summary))+'</div></div>';
+            if(parsed.line_comments) html += '<div class="meta"><strong>Line comments:</strong><pre>'+escapeHtml(JSON.stringify(parsed.line_comments,null,2))+'</pre></div>';
+            if(parsed.micro_exercises) html += '<div class="meta"><strong>Exercises:</strong><pre>'+escapeHtml(JSON.stringify(parsed.micro_exercises,null,2))+'</pre></div>';
+          } else if(mode==='generate-tests' && typeof parsed === 'object' && parsed.tests){
+            html += '<pre>'+escapeHtml(parsed.tests)+'</pre>';
+          } else {
+            html += '<pre>'+escapeHtml(JSON.stringify(parsed,null,2))+'</pre>';
+          }
+          bubbleEl.innerHTML = html;
+        } else {
+          const cleaned = sanitizeText(accumulated);
+          const codeHtml = cleaned.replace(/```(?:python\n)?([\s\S]*?)```/g, (_, code) => {
+            return '<pre><code class="language-python">'+escapeHtml(code)+'</code></pre>';
+          });
+          bubbleEl.innerHTML = codeHtml.replace(/\n/g,'<br/>');
+        }
+        chatEl.scrollTop = chatEl.scrollHeight;
+      }
+    }
+
+    const finalParsed = tryParseJSONFromText(accumulated);
+    if(finalParsed){
+      if(mode==='explain' && finalParsed.summary){
+        bubbleEl.innerHTML = '<div><strong>Summary:</strong><div>'+escapeHtml(String(finalParsed.summary))+'</div></div>'
+          + (finalParsed.line_comments?'<div class="meta"><strong>Line comments:</strong><pre>'+escapeHtml(JSON.stringify(finalParsed.line_comments,null,2))+'</pre></div>':'')
+          + (finalParsed.micro_exercises?'<div class="meta"><strong>Exercises:</strong><pre>'+escapeHtml(JSON.stringify(finalParsed.micro_exercises,null,2))+'</pre></div>':'');
+      } else {
+        bubbleEl.innerHTML = '<pre>'+escapeHtml(JSON.stringify(finalParsed,null,2))+'</pre>';
+      }
+    } else {
+      const codes = bubbleEl.querySelectorAll('pre code.language-python');
+      codes.forEach(el=>{
+        const text = el.textContent;
+        el.textContent = text;
+        Prism.highlightElement(el);
+      });
+    }
+
+    attachCopyButtons(bubbleEl);
+    setStatus('done');
+
+  } catch (err){
+    appendMessage('bot','<pre>Stream error: '+escapeHtml(String(err))+'</pre>');
+    setStatus('error');
+  } finally {
+    sendBtn.disabled = false;
+    promptEl.value = '';
+  }
+}
+
+/* shortcuts */
+sendBtn.addEventListener('click', send);
+promptEl.addEventListener('keydown', (e)=>{ if(e.ctrlKey && e.key==='Enter'){ send(); } });
+
+/* init */
+(function init(){
+  // fetch model info optionally
+  fetch('/model').then(r=>r.json()).then(info=>{
+    const el = document.createElement('div'); el.style.fontSize='12px'; el.style.color='var(--muted)';
+    document.querySelector('.header-controls').insertBefore(el, themeToggle);
+    el.innerText = info.GOOGLE_MODEL ? `Model: ${info.GOOGLE_MODEL}` : 'Model: auto';
+  }).catch(()=>{});
+  // restore scroll button initial
+  chatEl.scrollTop = chatEl.scrollHeight;
+  applyTheme(); // sets theme state from localStorage
+})();
+
+</script>
+</body>
+</html>

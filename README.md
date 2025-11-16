@@ -1,5 +1,5 @@
 <h1 align="center">TechGuru</h1>
-<p align="center"><strong>Your AI Pair-Programmer That Actually Teaches You</strong> <br> Built with ❤️ by <a href="https://github.com/shubhamranswal">Shubham Singh Ranswal</a> • 🌐<a href="https://shubhamranswal.github.io/PasPas" target="_blank">Visit Live Site</a>↗
+<p align="center"><strong>Your AI Pair-Programmer That Actually Teaches You</strong> <br> Built with ❤️ by <a href="https://github.com/shubhamranswal">Shubham Singh Ranswal</a>
 </p>
 
 <hr>
@@ -257,7 +257,7 @@ Google Gemini powers all deep reasoning:
 # 🤝 Contributing
 
 Pull requests are welcome!
-If you want to add test templates, fix prompts, or extend to new languages — feel free to contribute.
+If you want to add test templates, fix prompts, or extend to new languages - feel free to contribute.
 
 ---
 
