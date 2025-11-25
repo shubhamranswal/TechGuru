@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: techguru
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn demo.demo_fastapi:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    envVars:
+      - key: GOOGLE_API_KEY
+        value: ""       # leave blank here; set secret in Render dashboard or fill via CLI
