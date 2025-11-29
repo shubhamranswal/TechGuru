@@ -128,16 +128,14 @@ Replace filenames if needed.
 <img src="https://raw.githubusercontent.com/shubhamranswal/TechGuru/main/Images/screenshots/chat_empty.png" width="750px" />
 
 ### 🔍 Explain Mode
-
-<iframe width="750" height="422" src="https://www.youtube.com/embed/_ecYcip1vsU?rel=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![Explain Mode](https://img.youtube.com/vi/_ecYcip1vsU/0.jpg)](https://www.youtube.com/watch?v=_ecYcip1vsU)
 
 ### 🧪 Test Generation
-
-<iframe width="750" height="422" src="https://www.youtube.com/embed/37Hp9K_pG-o?rel=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![Test Generation](https://img.youtube.com/vi/37Hp9K_pG-o/0.jpg)](https://www.youtube.com/watch?v=37Hp9K_pG-o)
 
 ### 🏗️ Scaffolding
+[![Scaffolding](https://img.youtube.com/vi/PBHPKDOiGb8/0.jpg)](https://www.youtube.com/watch?v=PBHPKDOiGb8)
 
-<iframe width="750" height="422" src="https://www.youtube.com/embed/PBHPKDOiGb8?rel=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ---
 
