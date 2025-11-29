@@ -129,15 +129,15 @@ Replace filenames if needed.
 
 ### 🔍 Explain Mode
 
-<img src="https://raw.githubusercontent.com/shubhamranswal/TechGuru/main/Images/screenshots/chat.mp4" width="750px" />
+<iframe width="750" height="422" src="https://www.youtube.com/embed/_ecYcip1vsU?rel=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### 🧪 Test Generation
 
-<img src="https://raw.githubusercontent.com/shubhamranswal/TechGuru/main/Images/screenshots/chat_test_generate.mp4" width="750px" />
+<iframe width="750" height="422" src="https://www.youtube.com/embed/37Hp9K_pG-o?rel=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### 🏗️ Scaffolding
 
-<img src="https://raw.githubusercontent.com/shubhamranswal/TechGuru/main/Images/screenshots/chat_scaffold.mp4" width="750px" />
+<iframe width="750" height="422" src="https://www.youtube.com/embed/PBHPKDOiGb8?rel=0" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ---
 
